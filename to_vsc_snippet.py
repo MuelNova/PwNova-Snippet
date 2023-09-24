@@ -2,6 +2,15 @@
 
 import json
 
+json_template = {
+    "Insert PwnTools Python Code": {
+        "prefix": "pwn",
+        "body": [],
+        "description": "Insert PwnTools Python Code"
+    }
+}
+file_path = 'template.py'
+
 def convert_to_vscode_snippet(file_path: str):
     # 读取文件中的所有行
     with open(file_path, 'r', encoding='utf-8') as file:
@@ -11,9 +20,11 @@ def convert_to_vscode_snippet(file_path: str):
     snippet_body = [line.rstrip() for line in lines]
     snippet_body += ['']  # 添加空行
 
-    return json.dumps(snippet_body, indent=4)
+    # 生成VSCode片段
+    json_template['Insert PwnTools Python Code']['body'] = snippet_body
+    with open('template.json', 'w', encoding='utf-8') as file:
+        file.write(json.dumps(json_template, indent=4))
+    return json.dumps(json_template, indent=4)
 
-# 替换为您的代码文件路径
-file_path = 'template.py'
 
 print(convert_to_vscode_snippet(file_path))

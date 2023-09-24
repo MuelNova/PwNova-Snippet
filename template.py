@@ -23,7 +23,7 @@ GDB_SCRIPT = ''
 parser = ArgumentParser(description="Pwnable Commandline")
 parser.add_argument('ATTACHMENT', nargs='?', default=ATTACHMENT)
 parser.add_argument('--libc', '-l', nargs='?', default=LIBC)
-parser.add_argument('--debug', '-D', action='store_true', default=DEBUG)
+parser.add_argument('--no-debug', '-D', action='store_true', default=False, help='Disable debug mode')
 parser.add_argument('--remote', '-r', action='store', default="")
 parser.add_argument('--host', '-H', action='store', default='')
 parser.add_argument('--port', '-p', action='store', default=0)
@@ -53,10 +53,14 @@ if not Path(args.libc).exists():
 else:
     LIBC = args.libc
 
+if args.no_debug:
+    DEBUG = False
+
 if args.gdb:
     DEBUG = False
     GDB=True
     GDB_SCRIPT = args.gdb_script
+
 del parser, ArgumentParser, Path, args
 
 context.log_level = LOG_LEVEL
