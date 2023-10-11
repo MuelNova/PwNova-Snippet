@@ -69,6 +69,7 @@ context.os = OS
 context.arch = ARCH
 
 if REMOTE:
+    DEBUG = False
     sh = remote(HOST, PORT)
 elif GDB:
     sh = gdb.debug([ATTACHMENT], gdbscript=GDB_SCRIPT)
@@ -88,16 +89,16 @@ recvuntil = sh.recvuntil
 interactive = sh.interactive
 
 # Type Hint
-p4: Callable[[int, Any], bytes] = lambda number, **kwargs: p4(number, **kwargs)
-p8: Callable[[int, Any], bytes] = lambda number, **kwargs: p8(number, **kwargs)
-p16: Callable[[int, Any], bytes] = lambda number, **kwargs: p16(number, **kwargs)
-p32: Callable[[int, Any], bytes] = lambda number, **kwargs: p32(number, **kwargs)
-p64: Callable[[int, Any], bytes] = lambda number, **kwargs: p64(number, **kwargs)
-u4: Callable[[bytes, Any], int] = lambda number, **kwargs: u4(number, **kwargs)
-u8: Callable[[bytes, Any], int] = lambda number, **kwargs: u8(number, **kwargs)
-u16: Callable[[bytes, Any], int] = lambda number, **kwargs: u16(number, **kwargs)
-u32: Callable[[bytes, Any], int] = lambda number, **kwargs: u32(number, **kwargs)
-u64: Callable[[bytes, Any], int] = lambda number, **kwargs: u64(number, **kwargs)
+p4: Callable[[int, Any], bytes] = lambda number, **kwargs: pack(number, **kwargs)
+p8: Callable[[int, Any], bytes] = lambda number, **kwargs: pack(number, **kwargs)
+p16: Callable[[int, Any], bytes] = lambda number, **kwargs: pack(number, **kwargs)
+p32: Callable[[int, Any], bytes] = lambda number, **kwargs: pack(number, **kwargs)
+p64: Callable[[int, Any], bytes] = lambda number, **kwargs: pack(number, **kwargs)
+u4: Callable[[bytes, Any], int] = lambda number, **kwargs: unpack(number, **kwargs)
+u8: Callable[[bytes, Any], int] = lambda number, **kwargs: unpack(number, **kwargs)
+u16: Callable[[bytes, Any], int] = lambda number, **kwargs: unpack(number, **kwargs)
+u32: Callable[[bytes, Any], int] = lambda number, **kwargs: unpack(number, **kwargs)
+u64: Callable[[bytes, Any], int] = lambda number, **kwargs: unpack(number, **kwargs)
 
 
 def dbg(script: str = '', pause_time: int = 3, **kwargs):
