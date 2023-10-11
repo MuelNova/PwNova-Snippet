@@ -1,7 +1,7 @@
 from pwn import *
 from argparse import ArgumentParser
 from pathlib import Path
-from typing import Callable, Any
+from typing import Optional, Any, Literal
 
 # ------- Config -------
 LOG_LEVEL = 'debug'
@@ -89,16 +89,16 @@ recvuntil = sh.recvuntil
 interactive = sh.interactive
 
 # Type Hint
-p4: Callable[[int, Any], bytes] = lambda number, **kwargs: pack(number, **kwargs)
-p8: Callable[[int, Any], bytes] = lambda number, **kwargs: pack(number, **kwargs)
-p16: Callable[[int, Any], bytes] = lambda number, **kwargs: pack(number, **kwargs)
-p32: Callable[[int, Any], bytes] = lambda number, **kwargs: pack(number, **kwargs)
-p64: Callable[[int, Any], bytes] = lambda number, **kwargs: pack(number, **kwargs)
-u4: Callable[[bytes, Any], int] = lambda number, **kwargs: unpack(number, **kwargs)
-u8: Callable[[bytes, Any], int] = lambda number, **kwargs: unpack(number, **kwargs)
-u16: Callable[[bytes, Any], int] = lambda number, **kwargs: unpack(number, **kwargs)
-u32: Callable[[bytes, Any], int] = lambda number, **kwargs: unpack(number, **kwargs)
-u64: Callable[[bytes, Any], int] = lambda number, **kwargs: unpack(number, **kwargs)
+def p4(x: int, endianness: Optional[Literal['little', 'big']] = None, sign = Optional[bool], **kwargs: Any) -> bytes: return pack(x, 4, endianness, sign, **kwargs)
+def p8(x: int, endianness: Optional[Literal['little', 'big']] = None, sign = Optional[bool], **kwargs: Any) -> bytes: return pack(x, 8, endianness, sign, **kwargs)
+def p16(x: int, endianness: Optional[Literal['little', 'big']] = None, sign = Optional[bool], **kwargs: Any) -> bytes: return pack(x, 16, endianness, sign, **kwargs)
+def p32(x: int, endianness: Optional[Literal['little', 'big']] = None, sign = Optional[bool], **kwargs: Any) -> bytes: return pack(x, 32, endianness, sign, **kwargs)
+def p64(x: int, endianness: Optional[Literal['little', 'big']] = None, sign = Optional[bool], **kwargs: Any) -> bytes: return pack(x, 64, endianness, sign, **kwargs)
+def u4(x: bytes, **kwargs: Any) -> int: return unpack(x, 4, **kwargs)
+def u8(x: bytes, **kwargs: Any) -> int: return unpack(x, 8, **kwargs)
+def u16(x: bytes, **kwargs: Any) -> int: return unpack(x, 16, **kwargs)
+def u32(x: bytes, **kwargs: Any) -> int: return unpack(x, 32, **kwargs)
+def u64(x: bytes, **kwargs: Any) -> int: return unpack(x, 64, **kwargs)
 
 
 def dbg(script: str = '', pause_time: int = 3, **kwargs):
@@ -126,7 +126,7 @@ class Offset:
                     return self.base + getattr(self.program, item)[i]
             return _()
         return self.base + self.program.symbols[item]
-    
+
     def __getitem__(self, item) -> int:
         """
         offset['plt', 'puts']
@@ -137,5 +137,5 @@ class Offset:
             return self.base + getattr(self.program, item[0])[item[1]]
         else:
             return self.base + self.program.sym[item]
-        
+
 # ------- Exploit -------'
