@@ -10,6 +10,7 @@ ARCH = 'amd64'
 TERMINAL = ['wt.exe', 'bash', '-c']
 
 ATTACHMENT = './pwn'
+RUNARGS = ''
 LIBC = './libc.so.6'
 HOST = ''
 PORT = 0
@@ -29,6 +30,7 @@ parser.add_argument('--host', '-H', action='store', default='')
 parser.add_argument('--port', '-p', action='store', default=0)
 parser.add_argument('--gdb', '-g', action='store_true', default=GDB, help='Run binary using gdb.debug')
 parser.add_argument('--gdb-script', '-G', action='store', default=GDB_SCRIPT)
+parser.add_argument('--args', '-a', action='store', default=RUNARGS)
 args = parser.parse_args()
 
 if args.host and args.port:
@@ -40,6 +42,9 @@ if args.remote:
     REMOTE = True
     HOST, PORT = args.remote.split(':')
     PORT = int(PORT)
+
+if args.args:
+    RUNARGS = args.args
 
 # To avoid error
 if not Path(args.ATTACHMENT).exists():
@@ -72,9 +77,9 @@ if REMOTE:
     DEBUG = False
     sh = remote(HOST, PORT)
 elif GDB:
-    sh = gdb.debug([ATTACHMENT], gdbscript=GDB_SCRIPT)
+    sh = gdb.debug([ATTACHMENT, *RUNARGS.split(' ')], gdbscript=GDB_SCRIPT)
 else:
-    sh = process([ATTACHMENT])
+    sh = process([ATTACHMENT, *RUNARGS.split(' ')])
 
 libc = ELF(LIBC)
 elf = ELF(ATTACHMENT)
