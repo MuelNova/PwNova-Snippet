@@ -1,10 +1,10 @@
 from pwn import *
 from argparse import ArgumentParser
 from pathlib import Path
-from typing import Optional, Any, Literal
+from typing import Optional, Any, Literal, TypeVar, Callable
 
 # ------- Config -------
-LOG_LEVEL = 'info'
+LOG_LEVEL = 'debug'
 OS = 'linux'
 ARCH = 'amd64'
 TERMINAL = ['wt.exe', 'bash', '-c']
@@ -88,14 +88,20 @@ sh = get_sh()
 libc = ELF(LIBC)
 elf = ELF(ATTACHMENT)
 
-sendline = sh.sendline
-sendlineafter = sh.sendlineafter
-send = sh.send
-sendafter = sh.sendafter
-recv = sh.recv
-recvline = sh.recvline
-recvuntil = sh.recvuntil
-interactive = sh.interactive
+T = TypeVar('T', bound=Callable[..., Any])
+def wrapper(func: T) -> T:
+    def _wrapper(*args, **kwargs):
+        return getattr(sh, func.__name__)(*args, **kwargs)
+    return _wrapper
+
+sendline = wrapper(sh.sendline)
+sendlineafter = wrapper(sh.sendlineafter)
+send = wrapper(sh.send)
+sendafter = wrapper(sh.sendafter)
+recv = wrapper(sh.recv)
+recvline = wrapper(sh.recvline)
+recvuntil = wrapper(sh.recvuntil)
+interactive = wrapper(sh.interactive)
 
 # Type Hint
 def p4(x: int, endianness: Optional[Literal['little', 'big']] = None, sign = Optional[bool], **kwargs: Any) -> bytes: return pack(x, 4, endianness, sign, **kwargs)
@@ -108,7 +114,6 @@ def u8(x: bytes, **kwargs: Any) -> int: return unpack(x, 8, **kwargs)
 def u16(x: bytes, **kwargs: Any) -> int: return unpack(x, 16, **kwargs)
 def u32(x: bytes, **kwargs: Any) -> int: return unpack(x, 32, **kwargs)
 def u64(x: bytes, **kwargs: Any) -> int: return unpack(x, 64, **kwargs)
-
 
 def dbg(script: str = '', pause_time: int = 3, **kwargs):
     if DEBUG:
