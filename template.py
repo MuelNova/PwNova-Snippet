@@ -124,7 +124,9 @@ def dbg(script: str = '', pause_time: int = 3, **kwargs):
             pause(pause_time)
 
 class Offset:
-    def __init__(self, base: int, program: ELF):
+    plt: ELF.plt
+    got: ELF.got
+    def __init__(self, base: int, program: ELF = elf):
         self.base = base
         self.program = program
 
@@ -151,5 +153,18 @@ class Offset:
             return self.base + getattr(self.program, item[0])[item[1]]
         else:
             return self.base + self.program.sym[item]
+        
+    def __call__(self, item: int = 0) -> int:
+        return self.base + item
+    
+    def __repr__(self) -> str:
+        return f'{{base={hex(self.base)} {self.program}}}'
+    
+    def search(self, data: bytes) -> int:
+        return next(self.program.search(data)) + self.base
+    
+    def search_all(self, data: bytes) -> list[int]:
+        for i in self.program.search(data, self.base):
+            yield i + self.base
 
 # ------- Exploit -------'
