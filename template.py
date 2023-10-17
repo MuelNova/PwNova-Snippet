@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Optional, Any, Literal
 
 # ------- Config -------
-LOG_LEVEL = 'debug'
+LOG_LEVEL = 'info'
 OS = 'linux'
 ARCH = 'amd64'
 TERMINAL = ['wt.exe', 'bash', '-c']
@@ -34,11 +34,13 @@ parser.add_argument('--args', '-a', action='store', default=RUNARGS)
 args = parser.parse_args()
 
 if args.host and args.port:
+    DEBUG = False
     REMOTE = True
     HOST = args.host
     PORT = int(args.port)
 
 if args.remote:
+    DEBUG = False
     REMOTE = True
     HOST, PORT = args.remote.split(':')
     PORT = int(PORT)
@@ -73,14 +75,16 @@ context.terminal = TERMINAL
 context.os = OS
 context.arch = ARCH
 
-if REMOTE:
-    DEBUG = False
-    sh = remote(HOST, PORT)
-elif GDB:
-    sh = gdb.debug([ATTACHMENT, *RUNARGS.split(' ')], gdbscript=GDB_SCRIPT)
-else:
-    sh = process([ATTACHMENT, *RUNARGS.split(' ')])
+def get_sh():
+    if REMOTE:
+        sh_ = remote(HOST, PORT)
+    elif GDB:
+        sh_ = gdb.debug([ATTACHMENT, *RUNARGS.split(' ')], gdbscript=GDB_SCRIPT)
+    else:
+        sh_ = process([ATTACHMENT, *RUNARGS.split(' ')])
+    return sh_
 
+sh = get_sh()
 libc = ELF(LIBC)
 elf = ELF(ATTACHMENT)
 
