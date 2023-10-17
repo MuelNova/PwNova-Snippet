@@ -54,7 +54,7 @@ else:
     ATTACHMENT = args.ATTACHMENT
 
 if not Path(args.libc).exists():
-    LIBC = '/bin/sh'
+    LIBC = '/lib/x86_64-linux-gnu/libc.so.6'
 else:
     LIBC = args.libc
 
